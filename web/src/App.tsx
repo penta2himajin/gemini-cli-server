@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { SetupModal, ServerConfig } from './components/SetupModal';
+import { SetupModal } from './components/SetupModal';
+import type { ServerConfig } from './components/SetupModal';
 import { useGeminiSocket } from './hooks/useGeminiSocket';
 import { useChatState } from './hooks/useChatState';
 import { ChatTurnView } from './components/ChatTurnView';
@@ -23,7 +24,7 @@ export default function App() {
   
   const { turns, enqueueMessage, handleServerEvent } = useChatState();
   
-  const { status, sendMessage, connect, disconnect } = useGeminiSocket({
+  const { status, sendMessage } = useGeminiSocket({
     url: config ? getWsUrl(config) : '',
     sessionId: config?.sessionId || '',
     onMessage: handleServerEvent
