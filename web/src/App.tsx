@@ -36,6 +36,7 @@ export default function App() {
   const { status, sendMessage, sendRaw } = useGeminiSocket({
     url: config ? getWsUrl(config) : '',
     sessionId: activeSessionId,
+    clientType: 'web',
     onMessage: handleServerEvent
   });
 

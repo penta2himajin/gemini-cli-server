@@ -5,10 +5,11 @@ export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'er
 interface UseGeminiSocketProps {
   url: string;
   sessionId: string;
+  clientType: 'web' | 'cli';
   onMessage: (event: any) => void;
 }
 
-export function useGeminiSocket({ url, sessionId, onMessage }: UseGeminiSocketProps) {
+export function useGeminiSocket({ url, sessionId, clientType, onMessage }: UseGeminiSocketProps) {
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const wsRef = useRef<WebSocket | null>(null);
   const onMessageRef = useRef(onMessage);
@@ -22,7 +23,12 @@ export function useGeminiSocket({ url, sessionId, onMessage }: UseGeminiSocketPr
     if (!url) return;
     
     setStatus('connecting');
-    const ws = new WebSocket(url);
+    // クエリパラメータにクライアント情報を付与
+    const wsUrl = new URL(url);
+    wsUrl.searchParams.set('clientType', clientType);
+    if (sessionId) wsUrl.searchParams.set('sessionId', sessionId);
+
+    const ws = new WebSocket(wsUrl.toString());
     wsRef.current = ws;
 
     ws.onopen = () => {

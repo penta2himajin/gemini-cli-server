@@ -10,5 +10,46 @@
     "status": "active",
     "isPinned": false,
     "lastUpdated": "2026-05-20T18:27:26.775Z"
+  },
+  "bc296f52-ea2b-48db-b118-6ac5faac8730": {
+    "sessionId": "bc296f52-ea2b-48db-b118-6ac5faac8730",
+    "status": "archived",
+    "isPinned": false,
+    "title": "Initialize the Gemini CLI session and workspace context.",
+    "lastUpdated": "2026-05-20T16:50:01.261Z"
+  },
+  "test-123": {
+    "sessionId": "test-123",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-20T16:30:50.069Z"
+  },
+  "test2": {
+    "sessionId": "test2",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-20T16:28:52.656Z"
+  },
+  "test": {
+    "sessionId": "test",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-20T16:27:10.197Z"
+  },
+  "cli-session-1779294207728": {
+    "sessionId": "cli-session-1779294207728",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-20T16:26:19.771Z"
+  },
+  "web-session-1779302875608": {
+    "sessionId": "web-session-1779302875608",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-20T18:48:08.401Z"
   }
 }
