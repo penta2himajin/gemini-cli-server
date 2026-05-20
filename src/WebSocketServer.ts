@@ -19,8 +19,8 @@ export class AppWebSocketServer {
           const message = JSON.parse(data.toString());
           
           if (message.type === 'list_sessions') {
-            const metadata = this.metadataManager.getAllMetadata();
-            ws.send(JSON.stringify({ type: 'session_list', payload: { sessions: metadata } }));
+            const sessions = await this.metadataManager.syncWithFileSystem();
+            ws.send(JSON.stringify({ type: 'session_list', payload: { sessions } }));
           }
 
           if (message.type === 'update_metadata') {
