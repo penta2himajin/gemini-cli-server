@@ -84,8 +84,8 @@ async function start() {
   const args = process.argv.slice(2);
   let config = loadConfig();
 
-  // Force re-setup if /setting flag is passed
-  if (!config || args.includes('--setting')) {
+  // Force re-setup if /connection flag is passed
+  if (!config || args.includes('--connection')) {
     config = await runSetup(config);
   }
 
