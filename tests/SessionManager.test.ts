@@ -9,14 +9,14 @@ vi.mock('@google/gemini-cli-sdk', () => {
         id: opts?.sessionId || 'mock-generated-id',
         initialize: vi.fn().mockResolvedValue(undefined),
         sendStream: vi.fn().mockImplementation(async function* (input: string) {
-          yield { type: 'content', value: { text: `Reply to: ${input}` } };
+          yield { type: 'content', value: `Reply to: ${input}` };
         }),
       })),
       resumeSession: vi.fn().mockImplementation((sessionId) => ({
         id: sessionId,
         initialize: vi.fn().mockResolvedValue(undefined),
         sendStream: vi.fn().mockImplementation(async function* (input: string) {
-          yield { type: 'content', value: { text: `Reply to: ${input}` } };
+          yield { type: 'content', value: `Reply to: ${input}` };
         }),
       })),
     })),

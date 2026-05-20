@@ -11,7 +11,7 @@ export class SessionManager {
 
   constructor() {
     this.agent = new GeminiCliAgent({
-      // 本来はここにデフォルトのインストラクションや設定を記述します
+      instructions: 'You are a helpful coding assistant running as an API server.',
     });
   }
 
@@ -66,11 +66,11 @@ export class SessionManager {
       for await (const chunk of stream) {
         // SDKのチャンク形式を、API設計で定義したフォーマットにマッピングする
         if (chunk.type === 'content') {
-          yield { type: 'text_delta', payload: { text: chunk.value.text || '' } };
-        } else if (chunk.type === 'tool_call') {
-          yield { type: 'tool_start', payload: { toolName: chunk.value.name, args: chunk.value.args } };
-        } else if (chunk.type === 'tool_result') {
-          yield { type: 'tool_output', payload: { result: JSON.stringify(chunk.value.result) } };
+          yield { type: 'text_delta', payload: { text: chunk.value || '' } };
+        } else if (chunk.type === 'tool_call_request') {
+          yield { type: 'tool_start', payload: { toolName: chunk.value.toolName, args: chunk.value.args } };
+        } else if (chunk.type === 'tool_call_response') {
+          yield { type: 'tool_output', payload: { result: JSON.stringify(chunk.value.response) } };
         }
       }
       
