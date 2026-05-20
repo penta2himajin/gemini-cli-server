@@ -108,7 +108,8 @@ async function start() {
     env: {
       ...process.env,
       GEMINI_REMOTE_WS_URL: wsUrl,
-      GEMINI_SESSION_ID: config.sessionId // Ensure session ID syncs
+      GEMINI_SESSION_ID: config.sessionId, // Ensure session ID syncs
+      GEMINI_DISABLE_UPDATE_CHECK: 'true'  // Disable auto-update since we are running local source
     }
   });
 
