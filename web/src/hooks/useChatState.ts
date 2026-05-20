@@ -58,9 +58,6 @@ export function useChatState() {
   }, []);
 
   const handleServerEvent = useCallback((event: any) => {
-    const sessionId = event.sessionId;
-    if (!sessionId) return;
-
     if (event.type === 'session_list') {
       const metas: Record<string, SessionMetadata> = {};
       event.payload.sessions.forEach((m: SessionMetadata) => {
@@ -78,6 +75,9 @@ export function useChatState() {
       }));
       return;
     }
+
+    const sessionId = event.sessionId;
+    if (!sessionId) return;
 
     setTurnsBySession(prev => {
       const sessionTurns = [...(prev[sessionId] || [])];

@@ -51,7 +51,7 @@ export function useGeminiSocket({ url, sessionId, clientType, onMessage }: UseGe
     ws.onerror = () => {
       setStatus('error');
     };
-  }, [url]);
+  }, [url, sessionId, clientType]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
