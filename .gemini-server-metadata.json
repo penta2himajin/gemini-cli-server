@@ -51,5 +51,23 @@
     "status": "active",
     "isPinned": false,
     "lastUpdated": "2026-05-20T18:48:08.401Z"
+  },
+  "web-session-1779303400903": {
+    "sessionId": "web-session-1779303400903",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-20T18:56:57.444Z"
+  },
+  "web-session-1779303527858": {
+    "sessionId": "web-session-1779303527858",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-20T19:01:51.333Z"
+  },
+  "7cbf4d9b-ce3f-41aa-be1c-a90c7261252a": {
+    "sessionId": "7cbf4d9b-ce3f-41aa-be1c-a90c7261252a",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-20T19:02:04.401Z"
   }
 }

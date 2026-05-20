@@ -68,7 +68,7 @@ export class SessionManager {
         if (chunk.type === 'content') {
           yield { type: 'text_delta', payload: { text: chunk.value || '' } };
         } else if (chunk.type === 'tool_call_request') {
-          yield { type: 'tool_start', payload: { toolName: chunk.value.toolName, args: chunk.value.args } };
+          yield { type: 'tool_start', payload: { toolName: chunk.value.name, args: chunk.value.args } };
         } else if (chunk.type === 'tool_call_response') {
           yield { type: 'tool_output', payload: { result: JSON.stringify(chunk.value.response) } };
         }
