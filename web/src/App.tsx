@@ -50,7 +50,7 @@ export default function App() {
     const trimmed = input.trim();
     if (!trimmed) return;
     
-    if (trimmed === '/setting') {
+    if (trimmed === '/connection') {
       setShowSetup(true);
       setInput('');
       return;
@@ -144,7 +144,7 @@ export default function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask anything... (Use /setting to reconfigure, ↑/↓ for history)"
+              placeholder="Ask anything... (Use /connection to reconfigure, ↑/↓ for history)"
               className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 pr-12 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden min-h-[60px]"
               rows={Math.min(input.split('\n').length, 5) || 1}
             />
