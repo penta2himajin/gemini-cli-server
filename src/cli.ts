@@ -1,9 +1,12 @@
-import { WebSocket } from 'ws';
-import readline from 'readline';
 import prompts from 'prompts';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const CONFIG_PATH = path.join(os.homedir(), '.gemini-cli-client.json');
 const DEFAULT_PORT = 8080;
@@ -14,9 +17,6 @@ interface ClientConfig {
   sessionId: string;
 }
 
-// ==========================================
-// Config Management
-// ==========================================
 function loadConfig(): ClientConfig | null {
   if (fs.existsSync(CONFIG_PATH)) {
     try {
@@ -71,133 +71,50 @@ async function runSetup(existingConfig?: ClientConfig | null): Promise<ClientCon
   return newConfig;
 }
 
-// ==========================================
-// App State
-// ==========================================
-let ws: WebSocket | null = null;
-let rl: readline.Interface | null = null;
-let currentConfig: ClientConfig;
-
 function getWebSocketUrl(config: ClientConfig): string {
   if (config.mode === 'local') {
     return `ws://localhost:${DEFAULT_PORT}`;
   } else {
-    // Basic formatting, assumes port 8080 if not specified
     const ip = config.remoteIp || 'localhost';
     return ip.includes(':') ? `ws://${ip}` : `ws://${ip}:${DEFAULT_PORT}`;
   }
 }
 
-// ==========================================
-// CLI Core Logic
-// ==========================================
 async function start() {
+  const args = process.argv.slice(2);
   let config = loadConfig();
-  if (!config) {
-    config = await runSetup();
-  }
-  currentConfig = config;
-  connect(currentConfig);
-}
 
-function connect(config: ClientConfig) {
-  if (ws) {
-    ws.removeAllListeners();
-    ws.close();
-  }
-  if (rl) {
-    rl.close();
+  // Force re-setup if /setting flag is passed
+  if (!config || args.includes('--setting')) {
+    config = await runSetup(config);
   }
 
-  const url = getWebSocketUrl(config);
-  console.log(`Connecting to ${url}...`);
-  ws = new WebSocket(url);
-
-  ws.on('open', () => {
-    console.log(`\x1b[32m✔ Connected to Gemini CLI Server\x1b[0m`);
-    console.log(`\x1b[90mSession ID: ${config.sessionId}\x1b[0m`);
-    console.log(`\x1b[90mType /setting to change connection, /exit to quit.\x1b[0m\n`);
-    
-    rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    
-    promptUser();
-  });
-
-  ws.on('message', (data) => {
-    const event = JSON.parse(data.toString());
-    
-    if (event.type === 'text_delta') {
-      process.stdout.write(event.payload.text);
-    } else if (event.type === 'tool_start') {
-      console.log(`\n\x1b[33m[実行中: ${event.payload.toolName}]\x1b[0m`);
-    } else if (event.type === 'turn_complete') {
-      console.log();
-      promptUser();
-    } else if (event.type === 'error') {
-      console.error(`\n\x1b[31m[Error] ${event.payload.message}\x1b[0m`);
-      promptUser();
-    }
-  });
-
-  ws.on('close', () => {
-    console.log('\n\x1b[31mConnection closed by server.\x1b[0m');
-    process.exit(0);
-  });
-
-  ws.on('error', (err) => {
-    console.error('\n\x1b[31mWebSocket error:\x1b[0m', err.message);
-    console.log('\x1b[90mIf the server is remote, check your Tailscale connection.\x1b[0m');
-    console.log('\x1b[90mType /setting to reconfigure, or restart the CLI.\x1b[0m');
-    
-    // Fallback simple readline just to allow /setting command after a failure
-    rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    promptUser();
-  });
-}
-
-function promptUser() {
-  if (!rl) return;
+  const wsUrl = getWebSocketUrl(config);
   
-  rl.question('\x1b[32mYou>\x1b[0m ', async (input) => {
-    const command = input.trim();
-    
-    if (command === '/exit') {
-      ws?.close();
-      rl?.close();
-      process.exit(0);
-      return;
-    }
-    
-    if (command === '/setting') {
-      if (rl) rl.close();
-      const newConfig = await runSetup(currentConfig);
-      currentConfig = newConfig;
-      connect(currentConfig);
-      return;
-    }
+  // Point to the official CLI binary inside the adjacent gemini-cli monorepo
+  const officialCliPath = path.resolve(__dirname, '../../gemini-cli/packages/cli/dist/index.js');
+  
+  if (!fs.existsSync(officialCliPath)) {
+    console.error(`\x1b[31mError: Official CLI binary not found at ${officialCliPath}\x1b[0m`);
+    console.error('Please build the gemini-cli monorepo first.');
+    process.exit(1);
+  }
 
-    if (!command) {
-      promptUser();
-      return;
-    }
+  console.log(`\x1b[90mLaunching Official Gemini CLI connected to ${wsUrl}...\x1b[0m`);
 
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({
-        type: 'chat_message',
-        payload: { sessionId: currentConfig.sessionId, text: input }
-      }));
-    } else {
-      console.log('\x1b[31mNot connected. Use /setting to fix connection.\x1b[0m');
-      promptUser();
+  // Spawn the official CLI with the remote URL injected into the environment
+  const child = spawn('node', [officialCliPath], {
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      GEMINI_REMOTE_WS_URL: wsUrl,
+      GEMINI_SESSION_ID: config.sessionId // Ensure session ID syncs
     }
+  });
+
+  child.on('exit', (code) => {
+    process.exit(code || 0);
   });
 }
 
-// Start the CLI
 start().catch(console.error);
