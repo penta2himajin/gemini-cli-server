@@ -55,21 +55,25 @@ export function useGeminiSocket({ url, sessionId, onMessage }: UseGeminiSocketPr
     setStatus('disconnected');
   }, []);
 
-  const sendMessage = useCallback((text: string) => {
+  const sendRaw = useCallback((message: any) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'chat_message',
-        payload: { sessionId, text }
-      }));
+      wsRef.current.send(JSON.stringify(message));
       return true;
     }
     return false;
-  }, [sessionId]);
+  }, []);
+
+  const sendMessage = useCallback((text: string) => {
+    return sendRaw({
+      type: 'chat_message',
+      payload: { sessionId, text }
+    });
+  }, [sessionId, sendRaw]);
 
   useEffect(() => {
     connect();
     return () => disconnect();
   }, [connect, disconnect]);
 
-  return { status, sendMessage, connect, disconnect };
+  return { status, sendMessage, sendRaw, connect, disconnect };
 }

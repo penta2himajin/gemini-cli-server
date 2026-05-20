@@ -16,38 +16,82 @@ export type ChatTurn = {
   status: 'queued' | 'processing' | 'done' | 'error';
 };
 
-export function useChatState() {
-  const [turns, setTurns] = useState<ChatTurn[]>([]);
-  const [isAgentBusy, setIsAgentBusy] = useState(false);
+export interface SessionMetadata {
+  sessionId: string;
+  status: 'active' | 'archived';
+  isPinned: boolean;
+  title?: string;
+  lastUpdated: string;
+}
 
-  // When user hits Enter
-  const enqueueMessage = useCallback((text: string) => {
-    const id = `turn_${Date.now()}_${Math.random()}`;
-    setTurns(prev => [
-      ...prev,
-      { id, userText: text, agentText: '', tools: [], status: 'queued' }
-    ]);
-    return id;
+export function useChatState() {
+  const [turnsBySession, setTurnsBySession] = useState<Record<string, ChatTurn[]>>({});
+  const [metadataBySession, setMetadataBySession] = useState<Record<string, SessionMetadata>>({});
+  const [activeSessionId, setActiveSessionId] = useState<string>('');
+
+  const enqueueMessage = useCallback((sessionId: string, text: string) => {
+    const turnId = `turn_${Date.now()}_${Math.random()}`;
+    setTurnsBySession(prev => {
+      const sessionTurns = prev[sessionId] || [];
+      return {
+        ...prev,
+        [sessionId]: [
+          ...sessionTurns,
+          { id: turnId, userText: text, agentText: '', tools: [], status: 'queued' }
+        ]
+      };
+    });
+    
+    // タイトルが未設定なら最初のメッセージをタイトルにする（簡易版）
+    setMetadataBySession(prev => {
+      const meta = prev[sessionId];
+      if (meta && !meta.title) {
+        return {
+          ...prev,
+          [sessionId]: { ...meta, title: text.slice(0, 30) + (text.length > 30 ? '...' : '') }
+        };
+      }
+      return prev;
+    });
+
+    return turnId;
   }, []);
 
-  // Process incoming WebSocket events
   const handleServerEvent = useCallback((event: any) => {
-    setTurns(prevTurns => {
-      if (prevTurns.length === 0) return prevTurns;
+    const sessionId = event.sessionId;
+    if (!sessionId) return;
 
-      // Find the currently active turn, or the oldest queued turn
-      let activeIndex = prevTurns.findIndex(t => t.status === 'processing');
-      
-      // If we got an event but nothing is processing, promote the oldest queued item
+    if (event.type === 'session_list') {
+      const metas: Record<string, SessionMetadata> = {};
+      event.payload.sessions.forEach((m: SessionMetadata) => {
+        metas[m.sessionId] = m;
+      });
+      setMetadataBySession(metas);
+      return;
+    }
+
+    if (event.type === 'metadata_updated') {
+      const updated = event.payload;
+      setMetadataBySession(prev => ({
+        ...prev,
+        [updated.sessionId]: updated
+      }));
+      return;
+    }
+
+    setTurnsBySession(prev => {
+      const sessionTurns = [...(prev[sessionId] || [])];
+      if (sessionTurns.length === 0) return prev;
+
+      let activeIndex = sessionTurns.findIndex(t => t.status === 'processing');
       if (activeIndex === -1 && event.type !== 'turn_complete') {
-        activeIndex = prevTurns.findIndex(t => t.status === 'queued');
+        activeIndex = sessionTurns.findIndex(t => t.status === 'queued');
       }
 
-      if (activeIndex === -1) return prevTurns; // Nothing to update
+      if (activeIndex === -1) return prev;
 
-      const activeTurn = { ...prevTurns[activeIndex] };
+      const activeTurn = { ...sessionTurns[activeIndex] };
       activeTurn.status = 'processing';
-      setIsAgentBusy(true);
 
       if (event.type === 'text_delta') {
         activeTurn.agentText += event.payload.text;
@@ -61,12 +105,11 @@ export function useChatState() {
         }];
       } 
       else if (event.type === 'tool_output') {
-        // Mark the last running tool as complete
         const tools = [...activeTurn.tools];
-        const lastRunningToolIdx = tools.findLastIndex(t => t.status === 'running');
-        if (lastRunningToolIdx !== -1) {
-          tools[lastRunningToolIdx] = {
-            ...tools[lastRunningToolIdx],
+        const lastRunningIdx = tools.findLastIndex(t => t.status === 'running');
+        if (lastRunningIdx !== -1) {
+          tools[lastRunningIdx] = {
+            ...tools[lastRunningIdx],
             status: 'completed',
             result: event.payload.result
           };
@@ -75,24 +118,36 @@ export function useChatState() {
       } 
       else if (event.type === 'turn_complete') {
         activeTurn.status = 'done';
-        setIsAgentBusy(false);
       } 
       else if (event.type === 'error') {
         activeTurn.status = 'error';
         activeTurn.agentText += `\n\n**Error:** ${event.payload.message}`;
-        setIsAgentBusy(false);
       }
 
-      const newTurns = [...prevTurns];
-      newTurns[activeIndex] = activeTurn;
-      return newTurns;
+      sessionTurns[activeIndex] = activeTurn;
+      return { ...prev, [sessionId]: sessionTurns };
+    });
+
+    // メタデータの最終更新時刻も更新
+    setMetadataBySession(prev => {
+      const meta = prev[sessionId];
+      if (meta) {
+        return {
+          ...prev,
+          [sessionId]: { ...meta, lastUpdated: new Date().toISOString() }
+        };
+      }
+      return prev;
     });
   }, []);
 
   return {
-    turns,
-    isAgentBusy,
+    turnsBySession,
+    metadataBySession,
+    activeSessionId,
+    setActiveSessionId,
     enqueueMessage,
-    handleServerEvent
+    handleServerEvent,
+    setMetadataBySession
   };
 }
