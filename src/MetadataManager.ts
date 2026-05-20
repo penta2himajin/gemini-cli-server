@@ -45,15 +45,23 @@ export class MetadataManager {
     for (const file of chatFiles) {
       const absolutePath = path.join(tempDir, file.filePath);
       
-      // メタデータに存在しないセッションのみ処理
-      // (IDを特定するためにファイルを読み込む必要がある)
       const conversation = await loadConversationRecord(absolutePath);
       if (conversation && !this.metadata[conversation.sessionId]) {
+        // タイトルの決定: 要約があれば使い、なければ最初のメッセージ、それもなければID
+        let title = conversation.summary;
+        if (!title && conversation.messages.length > 0) {
+          const firstMsg = conversation.messages[0];
+          const content: any = firstMsg.displayContent || firstMsg.content;
+          if (Array.isArray(content) && content.length > 0) {
+            title = content[0].text?.slice(0, 30);
+          }
+        }
+
         this.metadata[conversation.sessionId] = {
           sessionId: conversation.sessionId,
-          status: 'archived', // CLI等の外部セッションはデフォルトでアーカイブ扱い
+          status: 'archived',
           isPinned: false,
-          title: conversation.summary || conversation.messages[0]?.displayContent?.[0]?.text?.slice(0, 30) || 'Legacy Session',
+          title: title || `Session ${conversation.sessionId.slice(0, 8)}`,
           lastUpdated: conversation.lastUpdated || file.lastUpdated
         };
       }
