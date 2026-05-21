@@ -39,6 +39,12 @@ ws.on('message', async (data) => {
       this.broadcastSessionList();
     }
 
+    if (message.type === 'update_config') {
+      const { sessionId, updates } = message.payload;
+      await this.sessionManager.updateSessionConfig(sessionId, updates);
+      ws.send(JSON.stringify({ type: 'config_updated', payload: { sessionId, updates } }));
+    }
+
     if (message.type === 'chat_message') {
       const { sessionId, text } = message.payload;
       const actualSessionId = await this.sessionManager.getOrCreateSession(sessionId);

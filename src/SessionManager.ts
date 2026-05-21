@@ -50,6 +50,17 @@ export class SessionManager {
   }
 
   /**
+   * 指定されたセッションの設定を更新します
+   */
+  async updateSessionConfig(sessionId: string, updates: { model?: string, memory_reload?: boolean, skills_reload?: boolean }) {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      throw new Error(`Session ${sessionId} not found`);
+    }
+    await session.updateConfig(updates);
+  }
+
+  /**
    * メッセージをSDKに送信し、API用のフォーマットに変換したストリームを返します
    */
   async *sendMessage(sessionId: string, text: string): AsyncGenerator<ServerEvent, void, unknown> {
