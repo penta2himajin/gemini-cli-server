@@ -7,6 +7,7 @@ export interface ServerEvent {
 
 export class SessionManager {
   private sessions = new Map<string, any>();
+  private abortControllers = new Map<string, AbortController>();
   private agent: GeminiCliAgent;
 
   constructor() {
@@ -61,6 +62,17 @@ export class SessionManager {
   }
 
   /**
+   * 現在進行中のリクエストを中止します
+   */
+  abort(sessionId: string) {
+    const controller = this.abortControllers.get(sessionId);
+    if (controller) {
+      controller.abort();
+      this.abortControllers.delete(sessionId);
+    }
+  }
+
+  /**
    * スラッシュコマンドをサーバー側で実行します
    */
   async *runCommand(sessionId: string, raw: string): AsyncGenerator<ServerEvent, void, unknown> {
@@ -70,8 +82,11 @@ export class SessionManager {
       return;
     }
 
+    const controller = new AbortController();
+    this.abortControllers.set(sessionId, controller);
+
     try {
-      const stream = session.runCommand(raw);
+      const stream = session.runCommand(raw, controller.signal);
       for await (const chunk of stream) {
         if (chunk.type === 'content') {
           yield { type: 'text_delta', payload: { text: chunk.value || '' } };
@@ -79,7 +94,13 @@ export class SessionManager {
       }
       yield { type: 'turn_complete', payload: {} };
     } catch (e: any) {
-      yield { type: 'error', payload: { message: e.message || 'Unknown error' } };
+      if (e.name === 'AbortError') {
+        yield { type: 'error', payload: { message: 'Command cancelled' } };
+      } else {
+        yield { type: 'error', payload: { message: e.message || 'Unknown error' } };
+      }
+    } finally {
+      this.abortControllers.delete(sessionId);
     }
   }
 
@@ -157,9 +178,12 @@ export class SessionManager {
       return;
     }
 
+    const controller = new AbortController();
+    this.abortControllers.set(sessionId, controller);
+
     try {
       // SDKから生のストリームを取得
-      const stream = session.sendStream(text);
+      const stream = session.sendStream(text, controller.signal);
       
       for await (const chunk of stream) {
         // SDKのチャンク形式を、API設計で定義したフォーマットにマッピングする
@@ -175,7 +199,13 @@ export class SessionManager {
       // すべて完了したことを通知
       yield { type: 'turn_complete', payload: {} };
     } catch (e: any) {
-      yield { type: 'error', payload: { message: e.message || 'Unknown error' } };
+      if (e.name === 'AbortError') {
+        yield { type: 'error', payload: { message: 'Request cancelled' } };
+      } else {
+        yield { type: 'error', payload: { message: e.message || 'Unknown error' } };
+      }
+    } finally {
+      this.abortControllers.delete(sessionId);
     }
   }
 }

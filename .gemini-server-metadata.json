@@ -118,5 +118,63 @@
     "isPinned": false,
     "title": "<session_context>\nThis is the ",
     "lastUpdated": "2026-05-21T10:44:27.932Z"
+  },
+  "web-session-1779360352276": {
+    "sessionId": "web-session-1779360352276",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-21T10:45:54.169Z"
+  },
+  "web-session-1779360488770": {
+    "sessionId": "web-session-1779360488770",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T10:48:17.314Z"
+  },
+  "7f5480fb-31f5-4eae-b7c1-caa52a866858": {
+    "sessionId": "7f5480fb-31f5-4eae-b7c1-caa52a866858",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T11:17:46.866Z"
+  },
+  "web-session-1779360606785": {
+    "sessionId": "web-session-1779360606785",
+    "status": "active",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-21T10:50:19.474Z"
+  },
+  "5020ca0a-c176-43ca-96aa-6805a8479e71": {
+    "sessionId": "5020ca0a-c176-43ca-96aa-6805a8479e71",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T12:45:54.509Z"
+  },
+  "web-session-1779364974988": {
+    "sessionId": "web-session-1779364974988",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-21T12:02:59.813Z"
+  },
+  "55a7d67e-0b33-4e2f-bb80-0c05375c8608": {
+    "sessionId": "55a7d67e-0b33-4e2f-bb80-0c05375c8608",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T12:48:58.768Z"
+  },
+  "d7839586-4182-44bc-a35b-81888abd2ff2": {
+    "sessionId": "d7839586-4182-44bc-a35b-81888abd2ff2",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T12:50:45.699Z"
+  },
+  "web-session-1779368031764": {
+    "sessionId": "web-session-1779368031764",
+    "status": "archived",
+    "isPinned": false,
+    "title": "<session_context>\nThis is the ",
+    "lastUpdated": "2026-05-21T12:53:53.495Z"
   }
 }

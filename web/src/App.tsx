@@ -58,14 +58,15 @@ export default function App() {
     }
   }, [status, refreshSessions]);
 
-  // Request history when switching sessions if not already loaded
+  // Load history when session changes
   useEffect(() => {
-    if (status === 'connected' && activeSessionId && !turnsBySession[activeSessionId]) {
+    if (status === 'connected' && activeSessionId) {
       sendRaw({ type: 'get_history', payload: { sessionId: activeSessionId } });
     }
-  }, [status, activeSessionId, sendRaw, turnsBySession]);
+  }, [status, activeSessionId, sendRaw]);
 
   const handleUpdateMetadata = useCallback((sessionId: string, updates: any) => {
+
     sendRaw({ type: 'update_metadata', payload: { sessionId, updates } });
   }, [sendRaw]);
 

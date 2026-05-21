@@ -62,6 +62,11 @@ ws.on('message', async (data) => {
       }
     }
 
+    if (message.type === 'abort') {
+      const { sessionId } = message.payload;
+      this.sessionManager.abort(sessionId);
+    }
+
     if (message.type === 'chat_message') {
       const { sessionId, text } = message.payload;
       const actualSessionId = await this.sessionManager.getOrCreateSession(sessionId);
