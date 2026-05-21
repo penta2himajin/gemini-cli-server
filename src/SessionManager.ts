@@ -84,6 +84,70 @@ export class SessionManager {
   }
 
   /**
+   * 指定されたセッションの履歴を取得します
+   */
+  async getSessionHistory(sessionId: string): Promise<any[]> {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return [];
+    }
+
+    const history = session.getHistory();
+    const turns: any[] = [];
+    
+    // Contentの羅列を、Web UIが扱いやすい「ターン」形式に変換する
+    // 簡易的な実装: user -> model のペアを探す
+    let currentTurn: any = null;
+
+    for (const content of history) {
+      if (content.role === 'user') {
+        // userメッセージの開始
+        if (currentTurn && currentTurn.status === 'processing') {
+          currentTurn.status = 'done';
+          turns.push(currentTurn);
+        }
+        
+        const text = content.parts.map((p: any) => p.text || '').join('');
+        // ツール実行結果（functionResponse）が含まれる場合は、直前のターンのツール結果として追加すべきだが、
+        // 簡易化のため一旦スキップするか、後続の改善課題とする。
+        if (content.parts.some((p: any) => p.functionResponse)) {
+          continue;
+        }
+
+        currentTurn = {
+          id: `turn_${Date.now()}_${Math.random()}`,
+          userText: text,
+          agentText: '',
+          tools: [],
+          status: 'processing'
+        };
+      } else if (content.role === 'model' || content.role === 'agent') {
+        if (!currentTurn) continue;
+
+        for (const part of content.parts) {
+          if (part.text) {
+            currentTurn.agentText += part.text;
+          } else if (part.functionCall) {
+            currentTurn.tools.push({
+              id: `tool_${Date.now()}_${Math.random()}`,
+              name: part.functionCall.name,
+              args: part.functionCall.args,
+              status: 'completed' // 履歴なので完了済みとする
+            });
+          }
+        }
+      }
+    }
+
+    if (currentTurn) {
+      currentTurn.status = 'done';
+      turns.push(currentTurn);
+    }
+
+    return turns;
+  }
+
+  /**
    * メッセージをSDKに送信し、API用のフォーマットに変換したストリームを返します
    */
   async *sendMessage(sessionId: string, text: string): AsyncGenerator<ServerEvent, void, unknown> {

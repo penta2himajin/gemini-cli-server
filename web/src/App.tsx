@@ -58,6 +58,13 @@ export default function App() {
     }
   }, [status, refreshSessions]);
 
+  // Request history when switching sessions if not already loaded
+  useEffect(() => {
+    if (status === 'connected' && activeSessionId && !turnsBySession[activeSessionId]) {
+      sendRaw({ type: 'get_history', payload: { sessionId: activeSessionId } });
+    }
+  }, [status, activeSessionId, sendRaw, turnsBySession]);
+
   const handleUpdateMetadata = useCallback((sessionId: string, updates: any) => {
     sendRaw({ type: 'update_metadata', payload: { sessionId, updates } });
   }, [sendRaw]);

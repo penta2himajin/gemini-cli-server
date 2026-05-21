@@ -32,6 +32,13 @@ ws.on('message', async (data) => {
       ws.send(JSON.stringify({ type: 'session_list', payload: { sessions } }));
     }
 
+    if (message.type === 'get_history') {
+      const { sessionId } = message.payload;
+      const actualSessionId = await this.sessionManager.getOrCreateSession(sessionId);
+      const history = await this.sessionManager.getSessionHistory(actualSessionId);
+      ws.send(JSON.stringify({ type: 'session_history', payload: { sessionId: actualSessionId, history } }));
+    }
+
     if (message.type === 'update_metadata') {
       const { sessionId, updates } = message.payload;
       const updated = await this.metadataManager.updateMetadata(sessionId, updates);

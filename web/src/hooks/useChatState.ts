@@ -76,6 +76,15 @@ export function useChatState() {
       return;
     }
 
+    if (event.type === 'session_history') {
+      const { sessionId, history } = event.payload;
+      setTurnsBySession(prev => ({
+        ...prev,
+        [sessionId]: history
+      }));
+      return;
+    }
+
     const sessionId = event.sessionId;
     if (!sessionId) return;
 
