@@ -91,8 +91,8 @@ async function start() {
 
   const wsUrl = getWebSocketUrl(config);
   
-  // Point to the official CLI binary inside the adjacent gemini-cli monorepo
-  const officialCliPath = path.resolve(__dirname, '../../gemini-cli/packages/cli/dist/index.js');
+  // Point to the official CLI binary inside the adjacent gemini-cli-client monorepo
+  const officialCliPath = path.resolve(__dirname, '../../gemini-cli-client/packages/cli/dist/index.js');
   
   if (!fs.existsSync(officialCliPath)) {
     console.error(`\x1b[31mError: Official CLI binary not found at ${officialCliPath}\x1b[0m`);
