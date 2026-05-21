@@ -89,33 +89,46 @@ async function start() {
     config = await runSetup(config);
   }
 
-  const wsUrl = getWebSocketUrl(config);
-  
-  // Point to the official CLI binary inside the adjacent gemini-cli-client monorepo
-  const officialCliPath = path.resolve(__dirname, '../../gemini-cli-client/packages/cli/dist/index.js');
-  
-  if (!fs.existsSync(officialCliPath)) {
-    console.error(`\x1b[31mError: Official CLI binary not found at ${officialCliPath}\x1b[0m`);
-    console.error('Please build the gemini-cli monorepo first.');
-    process.exit(1);
-  }
-
-  console.log(`\x1b[90mLaunching Official Gemini CLI connected to ${wsUrl}...\x1b[0m`);
-
-  // Spawn the official CLI with the remote URL injected into the environment
-  const child = spawn('node', [officialCliPath], {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      GEMINI_REMOTE_WS_URL: wsUrl,
-      GEMINI_SESSION_ID: config.sessionId, // Ensure session ID syncs
-      GEMINI_DISABLE_UPDATE_CHECK: 'true'  // Disable auto-update since we are running local source
+  while (true) {
+    const wsUrl = getWebSocketUrl(config);
+    
+    // Point to the official CLI binary inside the adjacent gemini-cli-client monorepo
+    const officialCliPath = path.resolve(__dirname, '../../gemini-cli-client/packages/cli/dist/index.js');
+    
+    if (!fs.existsSync(officialCliPath)) {
+      console.error(`\x1b[31mError: Official CLI binary not found at ${officialCliPath}\x1b[0m`);
+      console.error('Please build the gemini-cli monorepo first.');
+      process.exit(1);
     }
-  });
 
-  child.on('exit', (code) => {
-    process.exit(code || 0);
-  });
+    console.log(`\x1b[90mLaunching Official Gemini CLI connected to ${wsUrl}...\x1b[0m`);
+
+    // Spawn the official CLI with the remote URL injected into the environment
+    const child = spawn('node', [officialCliPath], {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        GEMINI_REMOTE_WS_URL: wsUrl,
+        GEMINI_SESSION_ID: config.sessionId, // Ensure session ID syncs
+        GEMINI_DISABLE_UPDATE_CHECK: 'true'  // Disable auto-update since we are running local source
+      }
+    });
+
+    const exitCode = await new Promise<number>((resolve) => {
+      child.on('exit', (code) => {
+        resolve(code || 0);
+      });
+    });
+
+    if (exitCode === 10) {
+      // Trigger re-setup
+      config = await runSetup(config);
+      // Loop will restart the CLI with new config
+      continue;
+    }
+
+    process.exit(exitCode);
+  }
 }
 
 start().catch(console.error);
