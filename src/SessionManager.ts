@@ -61,6 +61,29 @@ export class SessionManager {
   }
 
   /**
+   * スラッシュコマンドをサーバー側で実行します
+   */
+  async *runCommand(sessionId: string, raw: string): AsyncGenerator<ServerEvent, void, unknown> {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      yield { type: 'error', payload: { message: `Session ${sessionId} not found` } };
+      return;
+    }
+
+    try {
+      const stream = session.runCommand(raw);
+      for await (const chunk of stream) {
+        if (chunk.type === 'content') {
+          yield { type: 'text_delta', payload: { text: chunk.value || '' } };
+        }
+      }
+      yield { type: 'turn_complete', payload: {} };
+    } catch (e: any) {
+      yield { type: 'error', payload: { message: e.message || 'Unknown error' } };
+    }
+  }
+
+  /**
    * メッセージをSDKに送信し、API用のフォーマットに変換したストリームを返します
    */
   async *sendMessage(sessionId: string, text: string): AsyncGenerator<ServerEvent, void, unknown> {

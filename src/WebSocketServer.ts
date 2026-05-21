@@ -45,6 +45,16 @@ ws.on('message', async (data) => {
       ws.send(JSON.stringify({ type: 'config_updated', payload: { sessionId, updates } }));
     }
 
+    if (message.type === 'run_command') {
+      const { sessionId, raw } = message.payload;
+      const actualSessionId = await this.sessionManager.getOrCreateSession(sessionId);
+      
+      const stream = this.sessionManager.runCommand(actualSessionId, raw);
+      for await (const event of stream) {
+        ws.send(JSON.stringify({ ...event, sessionId: actualSessionId }));
+      }
+    }
+
     if (message.type === 'chat_message') {
       const { sessionId, text } = message.payload;
       const actualSessionId = await this.sessionManager.getOrCreateSession(sessionId);

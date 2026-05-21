@@ -1,15 +1,15 @@
 {
   "8ae0b967-d3ed-415c-a3fb-d911640ba56f": {
     "sessionId": "8ae0b967-d3ed-415c-a3fb-d911640ba56f",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T18:30:37.098Z"
+    "lastUpdated": "2026-05-20T19:53:34.947Z"
   },
   "web-session-1779301634537": {
     "sessionId": "web-session-1779301634537",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T18:27:26.775Z"
+    "lastUpdated": "2026-05-20T19:53:33.363Z"
   },
   "bc296f52-ea2b-48db-b118-6ac5faac8730": {
     "sessionId": "bc296f52-ea2b-48db-b118-6ac5faac8730",
@@ -48,44 +48,56 @@
   },
   "web-session-1779302875608": {
     "sessionId": "web-session-1779302875608",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T18:48:08.401Z"
+    "lastUpdated": "2026-05-20T19:53:35.469Z"
   },
   "web-session-1779303400903": {
     "sessionId": "web-session-1779303400903",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T18:56:57.444Z"
+    "lastUpdated": "2026-05-20T19:53:35.923Z"
   },
   "web-session-1779303527858": {
     "sessionId": "web-session-1779303527858",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T19:01:51.333Z"
+    "lastUpdated": "2026-05-20T19:53:36.469Z"
   },
   "7cbf4d9b-ce3f-41aa-be1c-a90c7261252a": {
     "sessionId": "7cbf4d9b-ce3f-41aa-be1c-a90c7261252a",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T19:02:04.401Z"
+    "lastUpdated": "2026-05-20T19:53:46.408Z"
   },
   "978b6c73-ddb9-4120-8151-37bfa9a76eb2": {
     "sessionId": "978b6c73-ddb9-4120-8151-37bfa9a76eb2",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T19:42:10.007Z"
+    "lastUpdated": "2026-05-20T19:54:35.514Z"
   },
   "web-session-1779306029629": {
     "sessionId": "web-session-1779306029629",
-    "status": "active",
+    "status": "archived",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T19:41:32.567Z"
+    "lastUpdated": "2026-05-20T19:53:47.476Z"
   },
   "web-session-1779306220488": {
     "sessionId": "web-session-1779306220488",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-20T19:53:48.852Z"
+  },
+  "2e830c5e-2a10-43ae-b646-c71965d8efb3": {
+    "sessionId": "2e830c5e-2a10-43ae-b646-c71965d8efb3",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T06:57:57.622Z"
+  },
+  "4d387daa-675e-499a-821a-8d5574265c6e": {
+    "sessionId": "4d387daa-675e-499a-821a-8d5574265c6e",
     "status": "active",
     "isPinned": false,
-    "lastUpdated": "2026-05-20T19:43:48.678Z"
+    "lastUpdated": "2026-05-21T06:58:30.792Z"
   }
 }
