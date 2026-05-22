@@ -176,5 +176,23 @@
     "isPinned": false,
     "title": "<session_context>\nThis is the ",
     "lastUpdated": "2026-05-21T12:53:53.495Z"
+  },
+  "a91c452b-0251-4382-beda-6999415ac5dc": {
+    "sessionId": "a91c452b-0251-4382-beda-6999415ac5dc",
+    "status": "active",
+    "isPinned": false,
+    "lastUpdated": "2026-05-21T17:48:51.876Z"
+  },
+  "e1121724-16db-4e5e-ad36-515ee8566912": {
+    "sessionId": "e1121724-16db-4e5e-ad36-515ee8566912",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-22T01:19:45.765Z"
+  },
+  "51b852c6-2776-4bd1-a159-2e3d54fe7f30": {
+    "sessionId": "51b852c6-2776-4bd1-a159-2e3d54fe7f30",
+    "status": "archived",
+    "isPinned": false,
+    "lastUpdated": "2026-05-22T01:29:46.262Z"
   }
 }
